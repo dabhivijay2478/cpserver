@@ -564,12 +564,13 @@ router.post("/ClubStudentReport", async (req, res) => {
   }
 });
 
-
-router.delete('/deleteuser/:enrollmentNo', async (req, res) => {
+router.delete("/deleteuser/:enrollmentNo", async (req, res) => {
   try {
-    const user = await User.findOneAndDelete({ EnrollmentNo: req.params.enrollmentNo });
+    const user = await User.findOneAndDelete({
+      EnrollmentNo: req.params.enrollmentNo,
+    });
     if (!user) {
-      return res.status(404).send({ error: 'User not found' });
+      return res.status(404).send({ error: "User not found" });
     }
     res.send(user);
   } catch (error) {
@@ -577,9 +578,7 @@ router.delete('/deleteuser/:enrollmentNo', async (req, res) => {
   }
 });
 
-
-
-router.put('/updateuser/:enrollmentNo', async (req, res) => {
+router.put("/updateuser/:enrollmentNo", async (req, res) => {
   try {
     const enrollmentNo = req.params.enrollmentNo;
     const updatedUser = await User.findOneAndUpdate(
@@ -588,12 +587,46 @@ router.put('/updateuser/:enrollmentNo', async (req, res) => {
       { new: true }
     );
     if (!updatedUser) {
-      return res.status(404).send({ error: 'User not found' });
+      return res.status(404).send({ error: "User not found" });
     }
     res.send(updatedUser);
   } catch (err) {
     res.status(400).send({ error: err.message });
   }
 });
+
+router.delete("/deleteevents/:id", async (req, res) => {
+  try {
+    const EventName = req.params.id;
+    const deletedEvent = await Addeventschema.findOneAndDelete({
+      EventName: EventName,
+    });
+    if (!deletedEvent) {
+      return res.status(404).send("Event not found");
+    }
+    res.send("Event deleted successfully");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Internal server error");
+  }
+});
+
+router.delete("/deleteContactus/:er", async (req, res) => {
+  try {
+    const EnrollmentNo = req.params.er;
+    const deletedEvent = await Contact.findOneAndDelete({
+      EnrollmentNo: EnrollmentNo,
+    });
+    if (!deletedEvent) {
+      return res.status(404).send("Event not found");
+    }
+    res.send("Contactus deleted successfully");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Internal server error");
+  }
+});
+
+
 
 module.exports = router;
