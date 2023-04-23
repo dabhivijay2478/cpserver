@@ -642,4 +642,13 @@ router.put("/updateevent/:eventname", async (req, res) => {
   }
 });
 
+router.get("/eventsbyclub/:ClubName", async (req, res) => {
+  const { ClubName } = req.params;
+
+  const result = await Addeventschema.find({ ClubName: ClubName });
+
+  res.send(result);
+});
+
+
 module.exports = router;
