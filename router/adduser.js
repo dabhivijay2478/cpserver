@@ -114,4 +114,26 @@ router.delete("/deleteClubName/:id", async (req, res) => {
     res.status(500).send("Internal server error");
   }
 });
+
+router.put("/updateclub/:id", async (req, res) => {
+  try {
+    const clubName = req.params.id;
+    const club = await Addnewclub.findOneAndUpdate(
+      { ClubName: clubName },
+      req.body,
+      {
+        new: true,
+      }
+    );
+
+    if (!club) {
+      return res.status(404).send({ error: "Club not found" });
+    }
+
+    res.send(club);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: "Internal server error" });
+  }
+});
 module.exports = router;

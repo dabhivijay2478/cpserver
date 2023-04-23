@@ -627,6 +627,19 @@ router.delete("/deleteContactus/:er", async (req, res) => {
   }
 });
 
-
+router.put("/updateevent/:eventname", async (req, res) => {
+  try {
+    const EventName = req.params.eventname;
+    const updatedEvent = await Addeventschema.findOneAndUpdate(
+      { EventName: EventName },
+      req.body,
+      { new: true }
+    );
+    res.json(updatedEvent);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
 
 module.exports = router;
