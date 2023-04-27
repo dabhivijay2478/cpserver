@@ -581,15 +581,15 @@ router.delete("/deleteuser/:enrollmentNo", async (req, res) => {
 router.put("/updateuser/:enrollmentNo", async (req, res) => {
   try {
     const enrollmentNo = req.params.enrollmentNo;
-    const updatedUser = await User.findOneAndUpdate(
+    const deleteuser = await User.findOneAndUpdate(
       { EnrollmentNo: enrollmentNo },
       req.body,
       { new: true }
     );
-    if (!updatedUser) {
+    if (!deleteuser) {
       return res.status(404).send({ error: "User not found" });
     }
-    res.send(updatedUser);
+    res.send(deleteuser);
   } catch (err) {
     res.status(400).send({ error: err.message });
   }
@@ -650,5 +650,75 @@ router.get("/eventsbyclub/:ClubName", async (req, res) => {
   res.send(result);
 });
 
+router.post("/bulkemail", async (req, res) => {
+  const FromEmail = process.env.MAIL_USERNAME;
+  const Password = process.env.MAIL_PASSWORD;
+  const { recipients } = req.body;
+
+  let transporter = nodemailer.createTransport({
+    service: "gmail",
+    host: "smtp.gmail.com",
+    auth: {
+      user: FromEmail,
+      pass: Password,
+    },
+  });
+
+  let mailPromises = recipients.map((recipient) => {
+    let mailOptions = {
+      from: FromEmail,
+      to: recipient.email,
+      subject: "Your Account Has Been Created!",
+      html: `
+        <p>Dear ${recipient.name},</p>
+        <p>We're excited to inform you that your account for our service has been successfully created! You can now log in and start using the service.</p>
+        <p>To log in, please use the following credentials:</p>
+        <ul>
+          <li>Email: ${recipient.email}</li>
+          <li>Password: ${recipient.password}</li>
+        </ul>
+        <p>If you have any questions or need assistance, please don't hesitate to contact our support team at [support email address or phone number]. We're here to help you get started and answer any questions you may have.</p>
+        <p>Before you start using the service, please take a moment to review our <a href="https://firebasestorage.googleapis.com/v0/b/cpprivacypolicy.appspot.com/o/Privacy%20Policy.pdf?alt=media&token=f121c1a3-854d-4d92-86cb-8707683296b2" target="_blank">privacy policy</a>  These documents explain your rights and responsibilities as a user of the service, and how we handle your personal information.</p>
+        <p>We're looking forward to helping you achieve your goals with our service. Thank you for choosing us!</p>
+        <p>Best regards,<br>[Dabhi Vijay]</p>
+      `,
+    };
+
+    return transporter.sendMail(mailOptions);
+  });
+
+  try {
+    await Promise.all(mailPromises);
+    console.log("Emails sent successfully!");
+    res.status(200).send("Emails sent successfully!");
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error);
+  }
+});
+
+router.get("/registereventreport", async (req, res) => {
+  try {
+    const lastregister = await registerevent.find({});
+    res.json(lastregister);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
+router.delete("/deleteregisterstudent/:enrollmentNo", async (req, res) => {
+  try {
+    const user = await registerevent.findOneAndDelete({
+      EnrollmentNo: req.params.enrollmentNo,
+    });
+    if (!user) {
+      return res.status(404).send({ error: "User not found" });
+    }
+    res.send(user);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
 
 module.exports = router;
