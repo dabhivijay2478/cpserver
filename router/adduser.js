@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 
 const Addnewuser = require("../models/adduserchema");
+const Addnewclub = require("../models/addclubschema");
+
 router.get("/vijay", (req, res) => {
   res.send("vijay router2");
 });
@@ -51,8 +53,6 @@ router.post("/addnewuser", async (req, res) => {
   }
 });
 
-const Addnewclub = require("../models/addclubschema");
-
 router.post("/addnewclub", async (req, res) => {
   const { ClubName, Factulty, Student, Dates } = req.body;
 
@@ -89,5 +89,47 @@ router.post("/addnewclub", async (req, res) => {
   }
 });
 
+router.get("/clubreport", async (req, res) => {
+  const result = await Addnewclub.find({});
 
+  res.send(result);
+});
+
+router.delete("/deleteClubName/:id", async (req, res) => {
+  try {
+    const ClubName = req.params.id;
+    const deletedEvent = await Addnewclub.findOneAndDelete({
+      ClubName: ClubName,
+    });
+    if (!deletedEvent) {
+      return res.status(404).send("ClubName not found");
+    }
+    res.send("ClubName deleted successfully");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Internal server error");
+  }
+});
+
+router.put("/updateclub/:id", async (req, res) => {
+  try {
+    const clubName = req.params.id;
+    const club = await Addnewclub.findOneAndUpdate(
+      { ClubName: clubName },
+      req.body,
+      {
+        new: true,
+      }
+    );
+
+    if (!club) {
+      return res.status(404).send({ error: "Club not found" });
+    }
+
+    res.send(club);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: "Internal server error" });
+  }
+});
 module.exports = router;
