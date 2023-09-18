@@ -41,13 +41,9 @@ router.post("/addnewuser", async (req, res) => {
         });
         await user.save();
 
-        // if (userRegister) {
+
         res.status(201).json({ message: "Add User SucessFully Added!@@" });
-        // }
-        // else
-        // {
-        // res.status(201).json({message:"failed"})
-        // }
+    
       }
     );
   } catch (error) {
